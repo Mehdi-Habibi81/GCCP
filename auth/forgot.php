@@ -14,8 +14,68 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<form method="post">
-    <input type="email" name="email" placeholder="Email" required>
+<!DOCTYPE html>
+<html>
 
-    <button type="submit">Send reset link</button>
-</form>
+<head>
+
+    <title>Forgot Password</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <div class="logo">
+            ?
+        </div>
+
+        <h1>Forgot Password?</h1>
+
+        <p class="subtitle">
+            Enter your email and we'll help you reset your password.
+        </p>
+
+        <form method="post">
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+            </div>
+
+            <button type="submit">
+                Send reset link
+            </button>
+
+        </form>
+
+        <div class="auth-links">
+
+            <p>
+                Remember your password?
+                <a href="login.php">
+                    Log in
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
