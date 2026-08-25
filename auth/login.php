@@ -21,9 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch();
 
             if ($user && password_verify($password, $user['password'])) {
-                // Login successful - store user session
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    
+    // Set a welcome message for the next page
+    $_SESSION['flash_message'] = "Welcome back, " . htmlspecialchars($user['username']) . "!";
+    
+    header("Location: ../dashboard.php");
+    exit();
+}
                 
                 header("Location: ../index.php");
                 exit();
