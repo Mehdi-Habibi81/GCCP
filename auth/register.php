@@ -5,30 +5,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $password_confirm = $_POST['password_confirm'];
 
-    // Validate password confirmation
-    if ($password !== $password_confirm) {
-        echo "Passwords do not match!";
-    } else {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+    $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        $stmt->execute([$username, $email, $hash]);
+    $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+    $stmt->execute([$username, $email, $hash]);
 
-        echo "User registered!";
-    }
+    echo "User registered!";
 }
 ?>
 
-<form method="post">
-    <input type="text" name="username" placeholder="Username" required>
+<!DOCTYPE html>
+<html>
 
-    <input type="email" name="email" placeholder="Email" required>
+<head>
 
-    <input type="password" name="password" placeholder="password" required>
+    <title>Create Account</title>
 
-    <input type="password" name="password_confirm" placeholder="Confirm password" required>
+    <link rel="stylesheet" href="style.css">
 
-    <button type="submit">Register</button>
-</form>
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <div class="logo">
+            A
+        </div>
+
+        <h1>Create Account</h1>
+
+        <p class="subtitle">
+            Create your new account
+        </p>
+
+        <form method="post">
+
+            <div class="form-group">
+
+                <label>Username</label>
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Choose a username"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Create a password"
+                    required
+                >
+
+            </div>
+
+            <button type="submit">
+                Create account
+            </button>
+
+        </form>
+
+        <div class="auth-links">
+
+            <p>
+                Already have an account?
+                <a href="login.php">
+                    Log in
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+    
