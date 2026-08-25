@@ -180,9 +180,9 @@ button:hover {
 
     border-radius: 10px;
 
-    background: #fef2f2;
+    background: #fef2f2 !important;
 
-    color: #dc2626;
+    color: #dc2626 !important;
 
     text-align: center;
 
@@ -196,9 +196,9 @@ button:hover {
 
     border-radius: 10px;
 
-    background: #f0fdf4;
+    background: #f0fdf4 !important;
 
-    color: #16a34a;
+    color: #16a34a !important;
 
     text-align: center;
 
