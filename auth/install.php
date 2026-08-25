@@ -88,82 +88,112 @@ try {
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="style.css">
     <title>Install Authentication System</title>
 </head>
 
 <body>
 
-<h1>Install Authentication System</h1>
+<div class="auth-container">
 
-<?php if ($message): ?>
+    <div class="auth-card">
 
-    <p>
-        <?php echo htmlspecialchars($message); ?>
-    </p>
+        <div class="logo">
+            A
+        </div>
 
-<?php endif; ?>
+        <h1>Install Authentication System</h1>
 
-<?php if (!$success): ?>
+        <p class="subtitle">
+            Configure your database to get started.
+        </p>
 
-<form method="POST">
+        <?php if ($message): ?>
 
-    <label>Database Host:</label>
-    <br>
-    <input
-        type="text"
-        name="host"
-        value="localhost"
-        required
-    >
+            <div class="message <?= $success ? 'success' : 'error' ?>">
+                <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?>
+            </div>
 
-    <br><br>
+        <?php endif; ?>
 
-    <label>Database Name:</label>
-    <br>
-    <input
-        type="text"
-        name="dbname"
-        placeholder="auth_db"
-        required
-    >
+        <?php if (!$success): ?>
 
-    <br><br>
+            <form method="POST">
 
-    <label>Database Username:</label>
-    <br>
-    <input
-        type="text"
-        name="username"
-        value="root"
-        required
-    >
+                <div class="form-group">
+                    <label for="host">Database Host</label>
 
-    <br><br>
+                    <input
+                        id="host"
+                        type="text"
+                        name="host"
+                        value="localhost"
+                        required
+                    >
+                </div>
 
-    <label>Database Password:</label>
-    <br>
-    <input
-        type="password"
-        name="password"
-    >
+                <div class="form-group">
+                    <label for="dbname">Database Name</label>
 
-    <br><br>
+                    <input
+                        id="dbname"
+                        type="text"
+                        name="dbname"
+                        placeholder="auth_db"
+                        required
+                    >
+                </div>
 
-    <button type="submit">Install</button>
+                <div class="form-group">
+                    <label for="username">Database Username</label>
 
-</form>
+                    <input
+                        id="username"
+                        type="text"
+                        name="username"
+                        value="root"
+                        required
+                    >
+                </div>
 
-<?php else: ?>
+                <div class="form-group">
+                    <label for="password">Database Password</label>
 
-    <p>
-        Your database and users table have been created.
-    </p>
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                    >
+                </div>
 
-    <p>
-        <a href="register.php">Go to registration</a>
-    </p>
+                <button type="submit">
+                    Install
+                </button>
 
-<?php endif; ?>
+            </form>
+
+        <?php else: ?>
+
+            <div class="auth-links">
+
+                <p>
+                    Your database and users table have been created.
+                </p>
+
+                <p>
+                    <a href="register.php">
+                        Go to registration
+                    </a>
+                </p>
+
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+
+</div>
 
 </body>
+
 </html>
