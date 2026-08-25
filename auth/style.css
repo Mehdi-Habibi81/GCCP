@@ -173,32 +173,36 @@ button:hover {
     text-decoration: underline;
 }
 
-.message {
+.error-message {
     padding: 12px;
 
     margin-bottom: 20px;
 
     border-radius: 10px;
 
-    background: #eff6ff;
+    background: #fef2f2;
 
-    color: #1d4ed8;
+    color: #dc2626;
 
     text-align: center;
 
     font-size: 14px;
 }
 
-.error {
-    background: #fef2f2;
+.success-message {
+    padding: 12px;
 
-    color: #dc2626;
-}
+    margin-bottom: 20px;
 
-.success {
+    border-radius: 10px;
+
     background: #f0fdf4;
 
     color: #16a34a;
+
+    text-align: center;
+
+    font-size: 14px;
 }
 
 @media (max-width: 480px) {
