@@ -20,13 +20,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } elseif (isset($_GET['token'])) {
     $token = $_GET['token'];
     ?>
-    <form method="POST">
-        <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
+    <!DOCTYPE html>
+<html>
 
-        <input type="password" name="password" placeholder="New password" required>
+<head>
 
-        <button type="submit">Set new password</button>
-</form>
-<?php
-} else {echo "No token provided.";} 
-?>
+    <title>Reset Password</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <div class="logo">
+            ✓
+        </div>
+
+        <h1>Reset Password</h1>
+
+        <p class="subtitle">
+            Enter your new password below.
+        </p>
+
+        <form method="POST">
+
+            <input
+                type="hidden"
+                name="token"
+                value="<?php echo htmlspecialchars($token); ?>"
+            >
+
+            <div class="form-group">
+
+                <label>New Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your new password"
+                    required
+                >
+
+            </div>
+
+            <button type="submit">
+                Set new password
+            </button>
+
+        </form>
+
+        <div class="auth-links">
+
+            <p>
+                <a href="login.php">
+                    Back to login
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
