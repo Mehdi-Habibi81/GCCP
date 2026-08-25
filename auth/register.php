@@ -5,13 +5,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $password_confirm = $_POST['password_confirm'];
 
-    $hash = password_hash($password, PASSWORD_DEFAULT);
+    // Validate password confirmation
+    if ($password !== $password_confirm) {
+        echo "Passwords do not match!";
+    } else {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-    $stmt->execute([$username, $email, $hash]);
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        $stmt->execute([$username, $email, $hash]);
 
-    echo "User registered!";
+        echo "User registered!";
+    }
 }
 ?>
 
@@ -22,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <input type="password" name="password" placeholder="password" required>
 
+    <input type="password" name="password_confirm" placeholder="Confirm password" required>
+
     <button type="submit">Register</button>
 </form>
-    
