@@ -1,5 +1,5 @@
 <?php
-// Prevent re-installation
+// Prevent re-installation if lock file exists
 if (file_exists(__DIR__ . '/.installed')) {
     die('Installation has already been completed. If you need to reinstall, delete the .installed file.');
 }
@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    // Validate database name (only alphanumeric + underscore)
+    // Validate database name (only letters, numbers, and underscores)
     if (!preg_match('/^[a-zA-Z0-9_]+$/', $dbname)) {
         $message = 'Database name can only contain letters, numbers, and underscores.';
     } else {
@@ -27,11 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
             );
 
-            // Create database if not exists
+            // Create database if it doesn't exist
             $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
             $pdo->exec("USE `$dbname`");
 
-            // Create users table with created_at
+            // Create users table with ALL required columns
             $sql = "
                 CREATE TABLE IF NOT EXISTS users (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -45,13 +45,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ";
             $pdo->exec($sql);
 
-            // Build config.php content
+            // Generate config.php content
             $config = "<?php
 
 \$host = " . var_export($host, true) . ";
 \$dbname = " . var_export($dbname, true) . ";
 \$user = " . var_export($username, true) . ";
 \$pass = " . var_export($password, true) . ";
+
+// Start session for all pages
+session_start();
 
 try {
     \$pdo = new PDO(
@@ -65,12 +68,13 @@ try {
 }
 ?>";
 
+            // Write config file
             if (file_put_contents('config.php', $config) === false) {
                 throw new Exception('Could not create config.php. Check folder permissions.');
             }
-            chmod('config.php', 0600); // Restrict permissions
+            chmod('config.php', 0600); // Restrict file permissions
 
-            // Create lock file
+            // Create lock file to prevent re-installation
             file_put_contents('.installed', 'Installed on ' . date('Y-m-d H:i:s'));
 
             $success = true;
@@ -86,6 +90,7 @@ try {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -127,7 +132,7 @@ try {
             </form>
         <?php else: ?>
             <div class="auth-links">
-                <p>Your database and users table have been created.</p>
+                <p>✅ Your database and users table have been created.</p>
                 <p><a href="register.php">Go to registration</a></p>
             </div>
         <?php endif; ?>
