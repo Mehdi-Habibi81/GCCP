@@ -5,13 +5,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $password_confirm = $_POST['password_confirm'];
 
-    $hash = password_hash($password, PASSWORD_DEFAULT);
+    // Validate password confirmation
+    if ($password !== $password_confirm) {
+        $error = "Passwords do not match!";
+    } else if (strlen($password) < 6) {
+        $error = "Password must be at least 6 characters long!";
+    } else {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-    $stmt->execute([$username, $email, $hash]);
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        $stmt->execute([$username, $email, $hash]);
 
-    echo "User registered!";
+        $success = "User registered successfully!";
+    }
 }
 ?>
 
@@ -41,6 +49,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="subtitle">
             Create your new account
         </p>
+
+        <?php if (isset($error)): ?>
+            <div class="error-message">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($success)): ?>
+            <div class="success-message">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
 
         <form method="post">
 
@@ -83,6 +103,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </div>
 
+            <div class="form-group">
+
+                <label>Confirm Password</label>
+
+                <input
+                    type="password"
+                    name="password_confirm"
+                    placeholder="Confirm your password"
+                    required
+                >
+
+            </div>
+
             <button type="submit">
                 Create account
             </button>
@@ -106,4 +139,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
-    
