@@ -1,16 +1,38 @@
 <?php
 require 'config.php';
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
 
-    $token = bin2hex(random_bytes(32));
-    $expires = date('Y-m-d H:i:s', time() + 3600);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $stmt = $pdo->prepare("UPDATE users SET reset_token = ?, reset_expires= ? WHERE email= ?");
-    $stmt->execute([$token, $expires, $email]);
+    $email = $_POST['email'] ?? '';
 
-    echo "If that email is registered a reset link has been sent.";
-    echo "Test link:<a href='http://localhost/auth/reset.php?token=$token'>reset here</a>";
+    if (empty($email)) {
+        echo "Please enter your email.";
+    } else {
+
+        // Generate a secure random token
+        $token = bin2hex(random_bytes(32));
+
+        // Let MySQL calculate the expiration time.
+        // This avoids PHP/MySQL timezone differences.
+        $stmt = $pdo->prepare(
+            "UPDATE users
+             SET reset_token = ?,
+                 reset_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR)
+             WHERE email = ?"
+        );
+
+        $stmt->execute([$token, $email]);
+
+        echo "If that email is registered, a reset link has been sent.";
+
+        // TESTING ONLY
+        // Remove this when you implement email sending.
+        echo "<br><br>";
+        echo "Test link: ";
+        echo "<a href='http://localhost/auth/reset.php?token="
+            . urlencode($token)
+            . "'>Reset password</a>";
+    }
 }
 ?>
 
@@ -41,7 +63,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             Enter your email and we'll help you reset your password.
         </p>
 
-        <form method="post">
+        <form method="POST">
 
             <div class="form-group">
 
@@ -78,4 +100,5 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 </body>
+
 </html>
