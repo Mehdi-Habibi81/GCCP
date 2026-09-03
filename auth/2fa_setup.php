@@ -200,7 +200,7 @@ $qrUrl = $google2fa->getQRCodeUrl(
 
                 <img
                     class="qr-code"
-                    src="https://chart.googleapis.com/chart?chs=220x220&cht=qr&chl=<?php echo urlencode($qrUrl); ?>"
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=<?php echo urlencode($qrUrl); ?>"
                     alt="Google Authenticator QR Code"
                 >
 
