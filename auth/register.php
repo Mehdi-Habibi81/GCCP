@@ -67,6 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $hash = password_hash($password, PASSWORD_DEFAULT);
 
                     // Insert new user
+                    // NOTE: the `password` column has a UNIQUE constraint at the DB level
+                    // (see migration: ALTER TABLE users ADD UNIQUE INDEX uniq_password_hash (password);)
+                    // This blocks hash-cloning attacks where a duplicate hash is inserted
+                    // directly (e.g. via DB admin panel access) to impersonate another user.
                     $stmt = $pdo->prepare(
                         "INSERT INTO users
                         (username, email, password, created_at)
@@ -90,8 +94,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
         } catch (PDOException $e) {
-            $error = "An error occurred during registration. Please try again later.";
-            error_log("Registration error: " . $e->getMessage());
+            // SQLSTATE 23000 = integrity constraint violation (includes UNIQUE constraint failures).
+            // In near-all-practical-cases the only way to hit this on the `password` column is a
+            // colliding bcrypt/argon2 hash, which essentially never happens by chance - so this
+            // branch is a strong signal of an attempted hash-cloning attack. Log it distinctly for
+            // alerting, but never reveal the real reason to the user.
+            if ($e->getCode() === '23000') {
+                $error = "An error occurred during registration. Please try again later.";
+                error_log("Registration blocked: duplicate password hash detected (possible hash-cloning attempt) - " . $e->getMessage());
+            } else {
+                $error = "An error occurred during registration. Please try again later.";
+                error_log("Registration error: " . $e->getMessage());
+            }
         }
     }
 }
