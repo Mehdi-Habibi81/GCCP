@@ -10,7 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user) {
         $password = $_POST['password'];
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+        // Use server-side pepper when hashing new passwords
+        $pepper = defined('PASSWORD_PEPPER') ? PASSWORD_PEPPER : (getenv('PASSWORD_PEPPER') ?: '');
+        $hash = password_hash($password . $pepper, PASSWORD_DEFAULT);
         $upd = $pdo->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?");
         $upd->execute([$hash, $user['id']]);
         echo "Password updated! <a href='login.php'>Log in</a>";

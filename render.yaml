@@ -1,0 +1,12 @@
+# Render service configuration
+# This file instructs Render how to deploy your service using the Dockerfile in the repository.
+
+services:
+  - type: web
+    name: gccp
+    env: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    # You should set these environment variables on Render's dashboard (do NOT commit secrets here):
+    #   DB_HOST, DB_NAME, DB_USER, DB_PASS, PASSWORD_PEPPER, APP_ENV
+    # Optionally attach a managed PostgreSQL/MySQL database and set DATABASE_URL.

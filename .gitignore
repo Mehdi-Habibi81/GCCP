@@ -1,0 +1,30 @@
+# Ignore vendor dependencies and local environment files
+/vendor/
+/vendor/*
+
+# Environment files
+.env
+.env.local
+
+# Application config - do NOT commit secrets
+config.php
+
+# Installer lock
+.installed
+
+# Composer
+composer.lock
+
+# Build artifacts
+node_modules/
+
+# QR images and uploads
+/public/qr/
+public/qr/*
+
+# OS files
+.DS_Store
+
+# IDE files
+.vscode/
+.idea/

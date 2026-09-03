@@ -1,69 +1,30 @@
-# GCCP
+# GCCP (PHP) - README
 
-GCCP is a PHP web application. This repository contains the source code and configuration for the project. Replace or expand this README with project-specific details where needed.
+This repository contains a PHP authentication demo application. The project is prepared to be deployed on Render using the provided Dockerfile.
 
-## Table of contents
-- Features
-- Requirements
-- Installation
-- Configuration
-- Running
-- Tests
-- Contributing
-- License
-- Contact
+Quick start (local using Docker Compose)
 
-## Features
-- Web application backend written in PHP
-- Two-factor authentication (2FA) setup (see auth/2fa_setup.php)
-- Add other features here as the project grows
-
-## Requirements
-- PHP 7.4+ (update to the actual required PHP version)
-- Composer
-- MySQL / MariaDB (or another supported database)
-- Common PHP extensions: ext-mbstring, ext-curl, ext-openssl (add any additional extensions required)
-
-## Installation
-1. Clone the repository:
-   git clone https://github.com/Mehdi-Habibi81/GCCP.git
-2. Change into the project directory:
-   cd GCCP
-3. Install PHP dependencies:
-   composer install
-4. Copy the example environment file and update values:
+1. Copy .env.example to .env and edit values:
    cp .env.example .env
-   Edit `.env` to set database credentials, app URL and other environment variables.
 
-## Configuration
-- Database: set DB_HOST, DB_NAME, DB_USER, DB_PASS in `.env`.
-- 2FA: see `auth/2fa_setup.php` for the two-factor authentication setup and configuration details. Update any related settings in `.env` if applicable.
-- External services: configure email, storage, or OAuth providers in `.env` as needed.
+2. Start services:
+   docker-compose up --build
 
-## Running (development)
-- Built-in PHP server (for development only):
-  php -S localhost:8000 -t public
+3. Visit: http://localhost:8080/auth/install.php to run the installer (create DB and config if needed).
 
-## Running (production)
-- Recommended: PHP-FPM with Nginx or Apache. Configure your webserver to serve the `public/` directory and ensure proper PHP-FPM setup.
+Deploying to Render
 
-## Tests
-- If PHPUnit or other test frameworks are used, run tests with:
-  ./vendor/bin/phpunit
-- or via a composer script if configured:
-  composer test
+1. Create a new Web Service on Render and connect your GitHub repository.
+2. Select "Docker" as the environment; Render will use the repository Dockerfile.
+3. Set the following environment variables in Render's dashboard (Settings > Environment):
+   - DB_HOST, DB_NAME, DB_USER, DB_PASS (or DATABASE_URL)
+   - PASSWORD_PEPPER — a long random secret kept out of the database
+   - APP_ENV=production
+4. (Optional) Provision a managed PostgreSQL/MySQL database on Render and attach it to your service.
+5. Deploy; once the service is healthy, visit your Render URL and run /auth/install.php to initialize the database if necessary.
 
-## Contributing
-- Open issues for bugs or feature requests.
-- Fork the repository, create a descriptive branch, make changes, and open a pull request.
-- Include tests and update documentation for new features.
-- Optionally follow coding standards (phpcs/phpstan) if configured.
-
-## License
-Specify the project license here (e.g., MIT). If none exists, add a LICENSE file to the repository.
-
-## Contact
-Maintainer: Mehdi-Habibi81
-GitHub: https://github.com/Mehdi-Habibi81
-
+Security notes
+- PASSWORD_PEPPER must never be stored in the database or committed to Git. Store it in Render environment variables or a secret manager.
+- Rotate the pepper if you suspect compromise. Rotation requires users to re-authenticate so their passwords can be rehashed.
+- Disable the installer after initial setup (remove or restrict install.php) to avoid accidental reconfiguration.
 
