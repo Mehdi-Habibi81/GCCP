@@ -36,15 +36,6 @@ if (!$user || (int)$user['two_factor_enabled'] !== 1) {
     exit();
 }
 
-// Create Google2FA instance and QR URL so the QR can be displayed on the verify page
-$google2fa = new Google2FA();
-$companyName = 'My Website';
-$qrUrl = $google2fa->getQRCodeUrl(
-    $companyName,
-    $user['username'],
-    $user['two_factor_secret']
-);
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $code = trim($_POST['code'] ?? '');
@@ -122,20 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 15px;
         }
 
-        .qr-code {
-            width: 220px;
-            height: 220px;
-            margin: 10px auto;
-            display: block;
-        }
-
-        .qr-note {
-            font-size: 13px;
-            color: #666;
-            text-align: center;
-            margin-top: 6px;
-        }
-
     </style>
 
 </head>
@@ -171,13 +148,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
         <?php endif; ?>
-
-        <!-- Show QR code to allow users to re-add the account to their authenticator app -->
-        <div class="twofa-box">
-            <p style="text-align:center;">If you need to re-add this account to your authenticator app, scan this QR code:</p>
-            <img class="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=<?php echo urlencode($qrUrl); ?>" alt="Google Authenticator QR Code">
-            <div class="qr-note">Or open your authenticator and add account using the secret: <strong><?php echo htmlspecialchars($user['two_factor_secret'], ENT_QUOTES, 'UTF-8'); ?></strong></div>
-        </div>
 
         <form method="post">
 
