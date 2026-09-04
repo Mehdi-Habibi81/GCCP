@@ -8,7 +8,7 @@ Quick start (local using Docker Compose)
    cp .env.example .env
 
 2. Start services:
-   docker-compose up --build
+   docker compose up --build
 
 3. Visit: http://localhost:8080/auth/install.php to run the installer (create DB and config if needed).
 
