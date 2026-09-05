@@ -1,16 +1,23 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # 1. Redirect /auth/ to /auth/login (without .php)
-    DirectoryIndex login
+    # 1. Redirect /auth to /auth/login (so the URL changes)
+    RewriteRule ^auth/?$ /auth/login [R=302,L]
 
-    # 2. Hide .php extension: 
-    # If someone types /auth/login, load /auth/login.php internally
+    # 2. Redirect any .php URL to the clean version (remove .php)
+    # e.g., /dashboard.php  ->  /dashboard
+    #       /auth/login.php ->  /auth/login
+    RewriteCond %{THE_REQUEST} \s/([^.]+)\.php [NC]
+    RewriteRule ^ /%1? [R=302,L]
+
+    # 3. Internally load the .php file when the clean URL is requested
+    # e.g., /dashboard  ->  /dashboard.php
+    #       /auth/login ->  /auth/login.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^([^\.]+)$ $1.php [L]
 
-    # 3. (Optional) If someone types /auth/login.php, redirect them to /auth/login
-    RewriteCond %{THE_REQUEST} \s/auth/([^.]+)\.php [NC]
-    RewriteRule ^ /auth/%1? [R=302,L]
 </IfModule>
+
+# 4. If someone visits /auth/ (with trailing slash), load login.php
+DirectoryIndex login index.php
