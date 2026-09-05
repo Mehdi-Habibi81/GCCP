@@ -2,6 +2,7 @@
 
 require 'config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/totp_crypto.php';
 
 use PragmaRX\Google2FA\Google2FA;
 
@@ -31,6 +32,14 @@ if (!$user) {
     exit();
 }
 
+// Decrypt the stored secret (if any) into memory only. The DB column
+// always holds ciphertext; $user['two_factor_secret'] from here on
+// in this request is the plaintext, used only for QR/manual display
+// and verifyKey() — never written back to the DB as plaintext.
+if (!empty($user['two_factor_secret'])) {
+    $user['two_factor_secret'] = decrypt_secret($user['two_factor_secret']);
+}
+
 $error = '';
 $success = '';
 
@@ -54,7 +63,7 @@ if (!$user['two_factor_enabled'] && empty($user['two_factor_secret'])) {
          WHERE id = ?"
     );
 
-    $stmt->execute([$secret, $userId]);
+    $stmt->execute([encrypt_secret($secret), $userId]);
 
     $user['two_factor_secret'] = $secret;
 }
