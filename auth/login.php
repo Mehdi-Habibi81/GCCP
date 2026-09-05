@@ -4,6 +4,9 @@ require 'config.php';
 $error = '';
 $username = '';
 
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_MINUTES = 15;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $username = trim($_POST['username'] ?? '');
@@ -22,7 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
 
             $stmt = $pdo->prepare(
-                "SELECT * FROM users
+                "SELECT id, username, password, two_factor_enabled,
+                        failed_login_attempts, locked_until
+                 FROM users
                  WHERE username = ?
                  LIMIT 1"
             );
@@ -30,11 +35,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$username]);
             $user = $stmt->fetch();
 
-            if ($user && password_verify($password, $user['password'])) {
+            // Is this account currently locked out?
+            $isLocked = $user
+                && $user['locked_until'] !== null
+                && strtotime($user['locked_until']) > time();
+
+            if ($isLocked) {
+
+                $error = "Too many failed attempts. Please try again later.";
+
+            } elseif ($user && password_verify($password, $user['password'])) {
 
                 /*
-                 * Password is correct.
-                 *
+                 * Password is correct. Reset the failed-attempt counter.
+                 */
+                $stmt = $pdo->prepare(
+                    "UPDATE users
+                     SET failed_login_attempts = 0, locked_until = NULL
+                     WHERE id = ?"
+                );
+                $stmt->execute([$user['id']]);
+
+                /*
                  * If 2FA is enabled, DON'T log the user in yet.
                  */
                 if ((int)$user['two_factor_enabled'] === 1) {
@@ -66,6 +88,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
             } else {
+
+                // Wrong password (or no such user) - only increment a
+                // counter if the account actually exists, so guessing
+                // usernames can't be used to lock out real accounts
+                // (that itself would be a denial-of-service vector).
+                if ($user) {
+
+                    $attempts = (int)$user['failed_login_attempts'] + 1;
+
+                    if ($attempts >= MAX_FAILED_ATTEMPTS) {
+
+                        $stmt = $pdo->prepare(
+                            "UPDATE users
+                             SET failed_login_attempts = ?,
+                                 locked_until = DATE_ADD(NOW(), INTERVAL ? MINUTE)
+                             WHERE id = ?"
+                        );
+                        $stmt->execute([$attempts, LOCKOUT_MINUTES, $user['id']]);
+
+                    } else {
+
+                        $stmt = $pdo->prepare(
+                            "UPDATE users
+                             SET failed_login_attempts = ?
+                             WHERE id = ?"
+                        );
+                        $stmt->execute([$attempts, $user['id']]);
+                    }
+                }
 
                 $error = "Invalid username or password!";
             }
