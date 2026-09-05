@@ -1,7 +1,6 @@
 <?php
 require 'config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/totp_crypto.php';
 
 use PragmaRX\Google2FA\Google2FA;
 
@@ -49,10 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $google2fa = new Google2FA();
 
-        $plaintextSecret = decrypt_secret($user['two_factor_secret']);
-
         $valid = $google2fa->verifyKey(
-            $plaintextSecret,
+            $user['two_factor_secret'],
             $code
         );
 
