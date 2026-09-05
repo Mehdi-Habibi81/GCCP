@@ -48,8 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $google2fa = new Google2FA();
 
+        //reverse
+        $originalSecret = strrev($user['two_factor_secret']);
         $valid = $google2fa->verifyKey(
-            $user['two_factor_secret'],
+            $originalSecret,
             $code
         );
 
