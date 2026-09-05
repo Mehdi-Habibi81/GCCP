@@ -48,15 +48,20 @@ if (!$user['two_factor_enabled'] && empty($user['two_factor_secret'])) {
 
     $secret = $google2fa->generateSecretKey();
 
+    $originalSecret = $secret;
+    //reverse
+
+    $reverserdSecret = strrev($secret);
+
     $stmt = $pdo->prepare(
         "UPDATE users
          SET two_factor_secret = ?
          WHERE id = ?"
     );
 
-    $stmt->execute([$secret, $userId]);
-    
-    $user['two_factor_secret'] = $secret;
+    $stmt->execute([$reverserdSecret, $userId]);
+
+    $user['two_factor_secret'] = $reverserdSecret;
 }
 
 /*
@@ -72,8 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$user['two_factor_enabled']) {
 
     } else {
 
+        $originalSecret = strrev($user['two_factor_secret']);
+
         $valid = $google2fa->verifyKey(
-            $user['two_factor_secret'],
+            $originalSecret,
             $code
         );
 
@@ -104,10 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$user['two_factor_enabled']) {
  */
 $companyName = 'My Website';
 
+$qrSecret = $originalSecret ?? strrev($user['two_factor_secret']);
+
 $qrUrl = $google2fa->getQRCodeUrl(
     $companyName,
     $user['email'],
-    $user['two_factor_secret']
+    $qrSecret
 );
 ?>
 
@@ -209,7 +218,7 @@ $qrUrl = $google2fa->getQRCodeUrl(
                 </p>
 
                 <div class="secret">
-                    <?php echo htmlspecialchars($user['two_factor_secret'], ENT_QUOTES, 'UTF-8'); ?>
+                    <?php echo htmlspecialchars($qrSecret, ENT_QUOTES, 'UTF-8'); ?>
                 </div>
 
                 <div class="twofa-instructions">
