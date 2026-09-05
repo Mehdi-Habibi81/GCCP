@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Redirect /auth/ to /auth/login (without .php)
+    DirectoryIndex login
+
+    # 2. Hide .php extension: 
+    # If someone types /auth/login, load /auth/login.php internally
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([^\.]+)$ $1.php [L]
+
+    # 3. (Optional) If someone types /auth/login.php, redirect them to /auth/login
+    RewriteCond %{THE_REQUEST} \s/auth/([^.]+)\.php [NC]
+    RewriteRule ^ /auth/%1? [R=302,L]
+</IfModule>
