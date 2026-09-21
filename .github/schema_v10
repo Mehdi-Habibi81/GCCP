@@ -1,0 +1,17 @@
+-- ============================================================
+-- Lab digitization module — schema v10
+-- Adds a flexible raw_data JSON column to test_results so each
+-- internal log sheet type (density, viscosity, foam, ...) can
+-- capture ALL of its paper-form fields, not just the final result.
+-- ============================================================
+
+SET @has_raw_data := (
+    SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'test_results' AND COLUMN_NAME = 'raw_data'
+);
+SET @add_raw_data_sql := IF(@has_raw_data = 0,
+    'ALTER TABLE test_results ADD COLUMN raw_data JSON NULL AFTER result_value',
+    'SELECT 1');
+PREPARE stmt FROM @add_raw_data_sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
